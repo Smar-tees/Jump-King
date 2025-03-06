@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Player State Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            margin: 20px;
+        }
+        #playerState {
+            margin: 20px auto;
+            width: 80%;
+            padding: 10px;
+            background: #fff;
+            border: 1px solid #ccc;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Player State Dashboard</h1>
+    <div id="playerState">
+        <h2>Current Player State</h2>
+        <p id="playerPos">X: 0, Y: 0</p>
+        <p id="playerVel">Vx: 0, Vy: 0</p>
+        <p id="playerTime">Time Elapsed: 0s</p>
+        <p id="playerJumps">Jumps: 0</p>
+        <p id="playerDistance">Distance Traveled: 0</p>
+    </div>
+
+    <script>
+        async function updatePlayerState() {
+            try {
+                const response = await fetch('/player');
+                const data = await response.json();
+                document.getElementById('playerPos').innerText =
+                    `X: ${data.x}, Y: ${data.y}`;
+                document.getElementById('playerVel').innerText =
+                    `Vx: ${data.vx}, Vy: ${data.vy}`;
+                document.getElementById('playerTime').innerText =
+                    `Time Elapsed: ${data.time_elapsed}s`;
+                document.getElementById('playerJumps').innerText =
+                    `Jumps: ${data.jumps_made}`;
+                document.getElementById('playerDistance').innerText =
+                    `Distance Traveled: ${data.distance_traveled}`;
+            } catch (error) {
+                console.error('Error fetching player state:', error);
+            }
+        }
+
+        // Poll every second
+        setInterval(updatePlayerState, 1000);
+    </script>
+</body>
+</html>

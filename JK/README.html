@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Codebase Documentation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        h1, h2, h3, h4 {
+            margin-top: 1.2em;
+            margin-bottom: 0.6em;
+        }
+        code {
+            background: #f9f9f9;
+            padding: 2px 4px;
+            font-family: Consolas, monospace;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            overflow-x: auto;
+        }
+        nav {
+            background: #eee;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+        nav a {
+            margin-right: 10px;
+        }
+        .toc-title {
+            font-weight: bold;
+            margin-right: 1em;
+        }
+        hr {
+            margin: 40px 0;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Complete Documentation for the Codebase</h1>
+
+<nav>
+    <span class="toc-title">Table of Contents:</span>
+    <a href="#overview">Overview</a> |
+    <a href="#shared_data">shared_data.py</a> |
+    <a href="#training_dashboard">training_dashboard.html</a> |
+    <a href="#level_editor">level_editor.py</a> |
+    <a href="#level_loader">level_loader.py</a> |
+    <a href="#main">main.py</a> |
+    <a href="#threading">Threading Explanation</a> |
+    <a href="#running">How to Run</a>
+</nav>
+
+<hr>
+
+<h2 id="overview">1. Overview</h2>
+<p>
+This project consists of multiple Python scripts (and one HTML file) that work together to create:
+</p>
+<ul>
+    <li>A game using <strong>pygame</strong>, where a player character can jump and move around platforms and walls.</li>
+    <li>A <strong>Flask-based local server</strong> (started in <code>main.py</code>) to serve a dashboard displaying real-time player state.</li>
+    <li>A <strong>level editor</strong> using pygame that allows you to create, save, and load platform-based levels.</li>
+</ul>
+
+<p>
+Below is a breakdown of each file, its contents, and usage details.
+</p>
+
+<hr>
+
+<h2 id="shared_data">2. <code>shared_data.py</code></h2>
+
+<pre><code>player_state = {
+    "x": 0,
+    "y": 0,
+    "vx": 0,
+    "vy": 0,
+    "time_elapsed": 0,
+    "jumps_made": 0,
+    "distance_traveled": 0
+}
+</code></pre>
+
+<h3>Purpose</h3>
+<p>
+This file stores a single Python dictionary <code>player_state</code> that holds the player's position, velocity,
+and other stats (time elapsed, jumps made, distance traveled).
+</p>
+<p>
+Because <code>player_state</code> lives in this dedicated module, any other script can import it and modify or read it,
+including the game logic in <code>main.py</code> and the dashboard view in <code>training_dashboard.html</code>.
+</p>
+
+<hr>
+
+<h2 id="training_dashboard">3. <code>training_dashboard.html</code></h2>
+
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;title&gt;Player State Dashboard&lt;/title&gt;
+    ...
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Player State Dashboard&lt;/h1&gt;
+    &lt;div id="playerState"&gt; ... &lt;/div&gt;
+
+    &lt;script&gt;
+        async function updatePlayerState() {
+            const response = await fetch('/player');
+            const data = await response.json();
+            // Update HTML elements with data.x, data.y, etc.
+        }
+        // Re-fetch every second
+        setInterval(updatePlayerState, 1000);
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<h3>Purpose</h3>
+<p>
+This file is a simple dashboard page that makes periodic AJAX requests (using <code>fetch</code>) to the endpoint <code>/player</code>
+exposed by the Flask server (running in <code>main.py</code>). It displays the player's current position, velocity, time elapsed,
+jump count, and distance traveled, updating once per second.
+</p>
+
+<h3>Key Elements</h3>
+<ul>
+    <li><strong>Update Interval:</strong> The <code>setInterval</code> call triggers a refresh of the data every second.</li>
+    <li><strong>Display Fields:</strong> X/Y coordinates, velocity, time elapsed, jumps, and distance traveled.</li>
+</ul>
+
+<hr>
+
+<h2 id="level_editor">4. <code>level_editor.py</code></h2>
+
+<pre><code>import pygame
+import json
+import os
+
+# Constants, color definitions, UI classes, and game object classes (Floor, Wall, PlatformSmall)
+# The LevelEditor class manages creation, selection, movement, saving, and loading of elements
+# Main loop at the bottom handles events, draws UI and grid
+</code></pre>
+
+<h3>Purpose</h3>
+<p>
+This module implements a graphical <strong>level editor</strong> using <strong>pygame</strong>. It provides a side-panel UI for:
+</p>
+<ul>
+    <li>Adding objects (floors, walls, or small platforms).</li>
+    <li>Selecting and dragging objects around with the mouse.</li>
+    <li>Saving the level layout to a JSON file.</li>
+    <li>Loading existing layouts from a JSON file.</li>
+    <li>Scrolling through a large world vertically using arrow keys.</li>
+</ul>
+
+<h3>Main Components</h3>
+<ul>
+    <li>
+        <code>Floor</code>, <code>Wall</code>, and <code>PlatformSmall</code>:
+        Classes that store position/size and have methods for drawing and detecting mouse-based collisions.
+    </li>
+    <li>
+        <code>Button</code>:
+        A small UI helper class to represent clickable areas for Save, Load, Clear, and mode toggling.
+    </li>
+    <li>
+        <code>LevelEditor</code>:
+        Central class that manages the list of elements, user interactions, saving/loading logic,
+        and mode toggling (floor, wall, platform).
+    </li>
+    <li>
+        <strong>Pygame event loop</strong> at the end of the file runs the editor window,
+        handles mouse clicks, keyboard input, and drawing.
+    </li>
+</ul>
+
+<h3>Usage Example</h3>
+<p>Typical usage flow in the editor:</p>
+<ol>
+    <li>Run <code>python level_editor.py</code>.</li>
+    <li>Left-click in the main (middle) area to place the currently selected object type (Floor, Wall, or PlatformSmall).</li>
+    <li>Press the <strong>Toggle</strong> button (or the button labeled "Floor"/"Wall"/"Platform") to cycle between creation modes.</li>
+    <li>Click on an existing object to select and drag it, or right-click to delete it.</li>
+    <li>Use <strong>Save</strong> to store the layout as <code>levels/level1.json</code>, or <strong>Load</strong> to reload it.</li>
+</ol>
+
+<hr>
+
+<h2 id="level_loader">5. <code>level_loader.py</code></h2>
+
+<pre><code>import json
+import os
+
+def load_level(filename="levels/level1.json"):
+    ...
+</code></pre>
+
+<h3>Purpose</h3>
+<p>
+This module contains a simple utility function <code>load_level</code> that loads level data from a JSON file.
+It looks for either a <code>platforms</code> key or an <code>elements</code> key in the loaded JSON. If neither is found,
+it returns an empty list.
+</p>
+
+<h3>Usage Example</h3>
+<p>
+Used inside <code>main.py</code> (or elsewhere) by calling <code>load_level("levels/level1.json")</code>,
+which returns a Python list describing the objects in the level (their coordinates, dimensions, etc.).
+</p>
+
+<hr>
+
+<h2 id="main">6. <code>main.py</code></h2>
+
+<pre><code>import pygame
+import json
+import os
+import math
+import threading
+import shared_data
+from flask import Flask, jsonify, send_from_directory
+from level_loader import load_level
+
+pygame.init()
+
+def lerp(a, b, t):
+    return a + (b - a) * t
+
+app = Flask(__name__)
+
+@app.route("/")
+def serve_dashboard():
+    return send_from_directory(os.path.dirname(__file__), "training_dashboard.html")
+
+@app.route("/player")
+def serve_player_state():
+    return jsonify(shared_data.player_state)
+
+def run_server():
+    app.run(port=5000, debug=False, use_reloader=False)
+
+class Player:
+    ...
+    # handle_input, apply_physics, collision checks, etc.
+
+def game_loop():
+    ...
+    # Main pygame loop
+
+if __name__ == "__main__":
+    # Start Flask server in a background thread
+    server_thread = threading.Thread(target=run_server)
+    server_thread.daemon = True
+    server_thread.start()
+
+    # Then run the game loop
+    game_loop()
+</code></pre>
+
+<h3>Purpose</h3>
+<p>
+This script serves as the <strong>primary entry point</strong> for running both:
+</p>
+<ol>
+    <li>
+        The <strong>Flask server</strong> on port 5000 (in a background thread).
+    </li>
+    <li>
+        The <strong>pygame game loop</strong>, which displays a window showing the player moving around loaded level elements.
+    </li>
+</ol>
+
+<h3>Main Components</h3>
+<ul>
+    <li>
+        <code>lerp(a, b, t)</code> – A helper function to smoothly interpolate between values <code>a</code> and <code>b</code>
+        by factor <code>t</code>.
+    </li>
+    <li>
+        <code>run_server()</code> – Launches the Flask app so that <code>training_dashboard.html</code> is served at <code>/</code>
+        and the player data at <code>/player</code>.
+    </li>
+    <li>
+        <code>Player</code> class – Encapsulates position, velocity, jump logic, collision checks, and drawing for the player sprite.
+        <ul>
+            <li><code>handle_input()</code>: Reads keyboard states to set horizontal velocity or initiate jumps.</li>
+            <li><code>apply_physics(elements)</code>: Applies gravity, updates <code>x</code>/<code>y</code>,
+                and performs collision detection with the loaded level elements.</li>
+            <li><code>draw(screen, camera_offset)</code>: Renders the player rectangle on the screen, adjusting for camera offset.</li>
+        </ul>
+    </li>
+    <li>
+        <code>game_loop()</code> – Main game loop that:
+        <ul>
+            <li>Initializes pygame.</li>
+            <li>Loads level data from <code>level_loader.load_level()</code>.</li>
+            <li>Updates <code>shared_data.player_state</code> with real-time position, velocity, jumps, etc.</li>
+            <li>Handles rendering and user input at ~60 FPS.</li>
+        </ul>
+    </li>
+</ul>
+
+<hr>
+
+<h2 id="threading">7. Threading Explanation</h2>
+<p>
+In <code>main.py</code>, you'll notice the lines:
+</p>
+
+<pre><code>server_thread = threading.Thread(target=run_server)
+server_thread.daemon = True
+server_thread.start()
+
+game_loop()
+</code></pre>
+
+<p>
+Here's how the threading works:
+</p>
+<ul>
+    <li>
+        <strong>Creating the Thread:</strong>
+        We instantiate a new <code>threading.Thread</code> object, specifying <code>target=run_server</code>.
+        This tells Python to run the function <code>run_server()</code> in a separate thread, rather than in the main thread.
+    </li>
+    <li>
+        <strong>Daemon Thread:</strong>
+        Setting <code>server_thread.daemon = True</code> means this thread will not prevent the program from exiting;
+        if all non-daemon threads finish, Python can exit even if this daemon thread is still running.
+        This ensures the server doesn’t block the termination of the main script.
+    </li>
+    <li>
+        <strong>Starting the Server:</strong>
+        <code>server_thread.start()</code> actually begins execution of <code>run_server()</code> in the background.
+        That function calls <code>app.run(...)</code> from Flask, which normally would block if it were in the main thread.
+        By putting it in its own thread, we can continue running other code simultaneously.
+    </li>
+    <li>
+        <strong>Running the Game Loop:</strong>
+        After starting the server thread, we immediately call <code>game_loop()</code> in the main thread.
+        The main thread handles pygame initialization, event handling, and rendering at 60 FPS.
+        Meanwhile, Flask runs in the background, hosting the dashboard on <code>localhost:5000</code>.
+    </li>
+    <li>
+        <strong>Why a Separate Thread?:</strong>
+        Pygame’s event loop and rendering typically need to run in the main thread on many platforms.
+        Placing Flask in a separate thread allows the game to run uninterrupted while also serving
+        the dashboard web page and player data simultaneously.
+    </li>
+</ul>
+
+<hr>
+
+<h2 id="running">8. How to Run the Entire Project</h2>
+<p>
+Below are the general steps to run the game and the dashboard together:
+</p>
+<ol>
+    <li><strong>Install Dependencies:</strong> You need Python (3.7+), <code>pygame</code>, and <code>Flask</code>.
+        <br>Example:
+        <pre><code>pip install pygame flask</code></pre>
+    </li>
+    <li><strong>Run the Main Script:</strong>
+        <pre><code>python main.py</code></pre>
+        <ul>
+            <li>This starts the Flask server on <code>http://127.0.0.1:5000</code> in a background thread.</li>
+            <li>It also launches the pygame window where you can control the player.</li>
+        </ul>
+    </li>
+    <li><strong>Open the Dashboard:</strong>
+        <p>Open your browser and go to <code>http://127.0.0.1:5000</code>. You will see the <em>Player State Dashboard</em>,
+        which updates every second to reflect the in-game player's metrics.</p>
+    </li>
+</ol>
+
+<p>
+If you want to <strong>edit/create levels</strong>, run:
+</p>
+<pre><code>python level_editor.py
+</code></pre>
+<p>
+In the editor window:
+</p>
+<ul>
+    <li>Use the left panel to <em>Save</em> or <em>Load</em> levels from <code>levels/level1.json</code> (by default).</li>
+    <li>Left-click to place a new object, right-click to delete, drag to move,
+        or toggle object type with the button labeled <em>Floor</em>/<em>Wall</em>/<em>Platform</em>.</li>
+    <li>When finished, press <strong>Save</strong>. Then, running <code>main.py</code> will load that saved layout for the game.</li>
+</ul>
+
+<hr>
+
+<h2>Additional Notes</h2>
+<ul>
+    <li>
+        <strong>Collision and Physics:</strong> The <code>Player</code> class in <code>main.py</code> uses simple rectangle collision checks
+        with the loaded level elements. Gravity is applied each frame, and <code>on_ground</code>
+        determines if jumps are allowed.
+    </li>
+    <li>
+        <strong>Camera Offset:</strong> The game smoothly follows the player vertically by interpolating
+        the camera offset to the player's <code>y</code> position.
+    </li>
+    <li>
+        <strong>JSON Level Format:</strong> Both the editor and the main game read/write JSON objects
+        containing a list of elements with <code>x</code>, <code>y</code>, <code>width</code>, <code>height</code>,
+        and optionally <code>type</code> (<em>floor</em>, <em>wall</em>, or <em>platform</em>).
+    </li>
+</ul>
+
+</body>
+</html>

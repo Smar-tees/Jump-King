@@ -1,0 +1,137 @@
+{
+    "elements": [
+        {
+            "type": "floor",
+            "x": 310,
+            "y": 580,
+            "width": 200,
+            "height": 20
+        },
+        {
+            "type": "floor",
+            "x": 150,
+            "y": 580,
+            "width": 200,
+            "height": 20
+        },
+        {
+            "type": "floor",
+            "x": 510,
+            "y": 580,
+            "width": 200,
+            "height": 20
+        },
+        {
+            "type": "platform",
+            "x": 290,
+            "y": 520,
+            "width": 67,
+            "height": 20
+        },
+        {
+            "type": "platform",
+            "x": 390,
+            "y": 460,
+            "width": 67,
+            "height": 20
+        },
+        {
+            "type": "platform",
+            "x": 330,
+            "y": 400,
+            "width": 67,
+            "height": 20
+        },
+        {
+            "type": "platform",
+            "x": 290,
+            "y": 340,
+            "width": 67,
+            "height": 20
+        },
+        {
+            "type": "platform",
+            "x": 230,
+            "y": 340,
+            "width": 67,
+            "height": 20
+        },
+        {
+            "type": "platform",
+            "x": 370,
+            "y": 280,
+            "width": 67,
+            "height": 20
+        },
+        {
+            "type": "platform",
+            "x": 310,
+            "y": 220,
+            "width": 67,
+            "height": 20
+        },
+        {
+            "type": "platform",
+            "x": 250,
+            "y": 220,
+            "width": 67,
+            "height": 20
+        },
+        {
+            "type": "platform",
+            "x": 210,
+            "y": 160,
+            "width": 67,
+            "height": 20
+        },
+        {
+            "type": "platform",
+            "x": 170,
+            "y": 160,
+            "width": 67,
+            "height": 20
+        },
+        {
+            "type": "wall",
+            "x": 150,
+            "y": 380,
+            "width": 20,
+            "height": 200
+        },
+        {
+            "type": "wall",
+            "x": 150,
+            "y": 180,
+            "width": 20,
+            "height": 200
+        },
+        {
+            "type": "wall",
+            "x": 150,
+            "y": 0,
+            "width": 20,
+            "height": 200
+        },
+        {
+            "type": "wall",
+            "x": 630,
+            "y": 380,
+            "width": 20,
+            "height": 200
+        },
+        {
+            "type": "wall",
+            "x": 630,
+            "y": 180,
+            "width": 20,
+            "height": 200
+        },
+        {
+            "type": "wall",
+            "x": 630,
+            "y": 0,
+            "width": 20,
+            "height": 200
+        }
+    ]
+}
