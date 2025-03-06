@@ -10,5 +10,12 @@ Using Keyboard or PyAutoGUI
 
 
 2. Feed shared_data.py into python interaction script
+
+Each Agent is going to have it's own thread
+I need to move the updating for the player class from the game.py file to the threaded function
+Then within each thread it will update the shared_data.py file
+Game.py will no longer do anything but display the level and the Agents on it using shared_data.py
+
+
 3. Think about how to train AI
 4. Profit 
