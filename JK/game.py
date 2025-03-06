@@ -101,14 +101,16 @@ class Player:
     def draw(self, screen, camera_offset):
         pygame.draw.rect(screen, (0, 255, 0), (self.x, self.y - camera_offset, self.width, self.height))
 
-def game_loop(shared_data, level, screen, clock):
+def game_loop(shared_data, level_data):
+    screen = pygame.display.set_mode((800, 600))
     pygame.display.set_caption("Jump King AI - Level Game")
+    clock = pygame.time.Clock()
 
     # Load level data
-    if isinstance(level, dict) and "elements" in level:
-        elements = level["elements"]
+    if isinstance(level_data, dict) and "elements" in level_data:
+        elements = level_data["elements"]
     else:
-        elements = level  # fallback if load_level returns a list
+        elements = level_data  # fallback if load_level returns a list
 
     # Create the player
     player = Player(300, 500)
@@ -121,14 +123,12 @@ def game_loop(shared_data, level, screen, clock):
 
     running = True
     while running:
+        dt = clock.tick(60)  # dt in milliseconds at ~60 FPS
+        time_elapsed += dt / 1000.0  # convert to seconds
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-                pygame.quit()
-                return
-        
-        dt = clock.tick(60)  # dt in milliseconds at ~60 FPS
-        time_elapsed += dt / 1000.0  # convert to seconds
 
         player.handle_input()
         player.apply_physics(elements)
@@ -156,6 +156,8 @@ def game_loop(shared_data, level, screen, clock):
                              (elem["x"], elem["y"] - camera_offset, elem["width"], elem["height"]))
         player.draw(screen, camera_offset)
         pygame.display.flip()
+
+    pygame.quit()
 
 # if __name__ == "__main__":
 #     # Start the Flask server in a background thread
