@@ -3,12 +3,6 @@
 Using Keyboard or PyAutoGUI
 
 
-
-
-
-
-
-
 2. Feed shared_data.py into python interaction script
 
 Each Agent is going to have it's own thread
@@ -18,4 +12,7 @@ Game.py will no longer do anything but display the level and the Agents on it us
 
 
 3. Think about how to train AI
+
+How should the AI decide when and how to move?
+
 4. Profit 

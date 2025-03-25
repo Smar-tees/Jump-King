@@ -1,9 +1,11 @@
-import keyboard
-import time
 import pygame
+import time
+import threading
+from JK import shared_data
+from JK.level_loader import load_level
 
 class Agent:
-    def __init__(self, x, y, color):
+    def __init__(self, x, y, color, agent_id):
         self.x = x
         self.y = y
         self.width = 30
@@ -16,6 +18,10 @@ class Agent:
         self.jumps_made = 0
         self.prev_y = y  # Only tracking vertical movement now
         self.distance_traveled = 0
+        # Add these new initializations
+        self.clock = pygame.time.Clock()
+        self.time_elapsed = 0.0
+        self.agent_id = agent_id
 
     def handle_input(self):
         keys = pygame.key.get_pressed()
@@ -43,26 +49,25 @@ class Agent:
         self.y += self.vy
         self.check_vertical_collision(elements)
 
-        # Zero out very small vertical velocity to avoid micro drifts
+        # Zero out very small vertical velocity
         if abs(self.vy) < 0.001:
             self.vy = 0
 
-        # If on ground, snap Y to an integer to eliminate sub-pixel drift
+        # If on ground, snap Y to integer
         if self.on_ground:
             self.y = int(self.y)
 
-        # Calculate change in Y and update distance traveled (only Y axis)
+        # Calculate vertical distance traveled
         dy = abs(self.y - self.prev_y)
         if not (self.on_ground and self.vy == 0):
-            if dy > 0.5:  # Only add significant vertical movement
+            if dy > 0.5:
                 self.distance_traveled += dy
         self.prev_y = self.y
 
-        # If the player falls below the screen, subtract an offset from y
+        # Reset if fallen too far
         if self.y > 600:
-            fall_offset = 600  # adjust as needed
-            self.y -= fall_offset
-            self.prev_y = self.y  # Reset prev_y so no extra distance is added
+            self.y -= 600
+            self.prev_y = self.y
 
     def check_horizontal_collision(self, elements):
         player_rect = pygame.Rect(self.x, self.y, self.width, self.height)
@@ -92,8 +97,62 @@ class Agent:
 
     def draw(self, screen, camera_offset):
         pygame.draw.rect(screen, self.color, (self.x, self.y - camera_offset, self.width, self.height))
+    
+    def update(self, elements):
+        dt = self.clock.tick(60)
+        self.time_elapsed += dt / 1000.0
+        
+        self.handle_input()
+        self.apply_physics(elements)
 
+        # Update shared data
+        shared_data.agent_states[self.agent_id].update({
+            "x": self.x,
+            "y": self.y,
+            "vx": self.vx,
+            "vy": self.vy,
+            "time_elapsed": round(self.time_elapsed, 2),
+            "jumps_made": self.jumps_made,
+            "distance_traveled": round(self.distance_traveled, 2)
+        })
 
-def run_agent():
-    agent = agent(300, 500, (255, 0, 255))
+def run_agent(agent_id):
+    # Initialize pygame if not already initialized
+    if not pygame.get_init():
+        pygame.init()
+
+    # Create agent instance
+    initial_state = shared_data.agent_states[agent_id]
+    agent = Agent(
+        initial_state["x"],
+        initial_state["y"],
+        initial_state["color"],
+        agent_id
+    )
+    
+    # Load level data
+    level_data = load_level()
+    if isinstance(level_data, dict) and "elements" in level_data:
+        elements = level_data["elements"]
+    else:
+        elements = level_data
+
+    running = True
+    while running:
+        try:
+            agent.update(elements)
+            time.sleep(1/60)  # Cap at ~60 FPS
+        except Exception as e:
+            print(f"Error in {agent_id} thread: {e}")
+            time.sleep(1)
+
+def run_agents(num_agents=6):
+    # Create and start agent threads
+    agent_threads = []
+    for i in range(1, num_agents + 1):
+        agent_id = f"agent{i}"
+        thread = threading.Thread(target=run_agent, args=(agent_id,))
+        thread.daemon = True
+        thread.start()
+        agent_threads.append(thread)
     
