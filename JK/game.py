@@ -1,8 +1,5 @@
 import pygame
-import json
-import os
-import math
-import threading
+from king import spawn_kings
 from flask import Flask, jsonify, send_from_directory
 
 pygame.init()
@@ -24,14 +21,13 @@ def game_loop(shared_data, level_data):
         elements = level_data  # fallback if load_level returns a list
 
     # Initialize default player position
-    playerx = 300
-    playery = 500
     camera_offset = 0
+
+    kings = spawn_kings(6)
 
     # Constants for drawing
     PLAYER_WIDTH = 30
     PLAYER_HEIGHT = 30
-    PLAYER_COLOR = (255, 0, 255)
 
     running = True
     while running:
@@ -61,11 +57,11 @@ def game_loop(shared_data, level_data):
                            (elem["x"], elem["y"] - camera_offset, elem["width"], elem["height"]))
         
         # Draw player
-        for king_state in shared_data.king_states.values():
-            pygame.draw.rect(screen, king_state['color'], 
-                            (king_state['x'], 
-                             king_state['y'] - camera_offset,
-                             PLAYER_WIDTH, PLAYER_HEIGHT))        
+        for king in kings:
+            king.update(elements)
+        
+            # Draw the king
+            pygame.draw.rect(screen, king.color, (king.x, king.y - camera_offset, king.width, king.height))   
         pygame.display.flip()
 
     pygame.quit()

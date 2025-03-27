@@ -116,43 +116,19 @@ class King:
             "distance_traveled": round(self.distance_traveled, 2)
         })
 
-def run_king(king_id):
-    # Initialize pygame if not already initialized
-    if not pygame.get_init():
-        pygame.init()
-
-    # Create king instance
-    initial_state = shared_data.king_states[king_id]
-    king = King(
-        initial_state["x"],
-        initial_state["y"],
-        initial_state["color"],
-        king_id
-    )
-    
-    # Load level data
-    level_data = load_level()
-    if isinstance(level_data, dict) and "elements" in level_data:
-        elements = level_data["elements"]
-    else:
-        elements = level_data
-
-    running = True
-    while running:
-        try:
-            king.update(elements)
-            time.sleep(1/60)  # Cap at ~60 FPS
-        except Exception as e:
-            print(f"Error in {king_id} thread: {e}")
-            time.sleep(1)
-
-def run_kings(num_kings=6):
-    # Create and start king threads
-    king_threads = []
+def spawn_kings(num_kings):
+    kings = []
     for i in range(1, num_kings + 1):
         king_id = f"king{i}"
-        thread = threading.Thread(target=run_king, args=(king_id,))
-        thread.daemon = True
-        thread.start()
-        king_threads.append(thread)
-    
+        initial_state = shared_data.king_states[king_id]
+        king = King(
+            initial_state["x"],
+            initial_state["y"],
+            initial_state["color"],
+            king_id
+        )
+        kings.append(king)
+        
+
+
+    return kings
