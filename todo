@@ -16,3 +16,16 @@ Game.py will no longer do anything but display the level and the Agents on it us
 How should the AI decide when and how to move?
 
 4. Profit 
+
+
+
+
+
+
+
+
+ - Make the camera offset work
+ - Figure out the Agent movement system - make it move randomly at first 
+ - Make the Agent reward system
+ - Make the generational learning algorithim
+ - Profit

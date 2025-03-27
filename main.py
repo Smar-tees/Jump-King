@@ -5,7 +5,7 @@ import math
 import threading
 import keyboard
 from JK import game, shared_data, level_loader
-from Agent import run_agents
+from king import run_kings
 from flask import Flask, jsonify, send_from_directory
 
 
@@ -34,8 +34,8 @@ if __name__ == "__main__":
     server_thread.daemon = True
     server_thread.start()
 
-    # Start the agents
-    run_agents(6)
+    # Start the kings
+    run_kings(6)
 
     # Start the game loop
     level = level_loader.load_level()

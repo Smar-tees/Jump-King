@@ -43,8 +43,8 @@ def game_loop(shared_data, level_data):
 
         # Update camera
         highest_player_y = float('inf')
-        for agent_state in shared_data.agent_states.values():
-            highest_player_y = min(highest_player_y, agent_state['y'])
+        for king_state in shared_data.king_states.values():
+            highest_player_y = min(highest_player_y, king_state['y'])
 
         target_offset = highest_player_y - screen.get_height() / 2
         camera_offset = lerp(camera_offset, target_offset, 0.1)
@@ -61,10 +61,10 @@ def game_loop(shared_data, level_data):
                            (elem["x"], elem["y"] - camera_offset, elem["width"], elem["height"]))
         
         # Draw player
-        for agent_state in shared_data.agent_states.values():
-            pygame.draw.rect(screen, agent_state['color'], 
-                            (agent_state['x'], 
-                             agent_state['y'] - camera_offset,
+        for king_state in shared_data.king_states.values():
+            pygame.draw.rect(screen, king_state['color'], 
+                            (king_state['x'], 
+                             king_state['y'] - camera_offset,
                              PLAYER_WIDTH, PLAYER_HEIGHT))        
         pygame.display.flip()
 

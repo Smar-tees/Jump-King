@@ -4,8 +4,8 @@ import threading
 from JK import shared_data
 from JK.level_loader import load_level
 
-class Agent:
-    def __init__(self, x, y, color, agent_id):
+class King:
+    def __init__(self, x, y, color, king_id):
         self.x = x
         self.y = y
         self.width = 30
@@ -21,7 +21,7 @@ class Agent:
         # Add these new initializations
         self.clock = pygame.time.Clock()
         self.time_elapsed = 0.0
-        self.agent_id = agent_id
+        self.king_id = king_id
 
     def handle_input(self):
         keys = pygame.key.get_pressed()
@@ -106,7 +106,7 @@ class Agent:
         self.apply_physics(elements)
 
         # Update shared data
-        shared_data.agent_states[self.agent_id].update({
+        shared_data.king_states[self.king_id].update({
             "x": self.x,
             "y": self.y,
             "vx": self.vx,
@@ -116,18 +116,18 @@ class Agent:
             "distance_traveled": round(self.distance_traveled, 2)
         })
 
-def run_agent(agent_id):
+def run_king(king_id):
     # Initialize pygame if not already initialized
     if not pygame.get_init():
         pygame.init()
 
-    # Create agent instance
-    initial_state = shared_data.agent_states[agent_id]
-    agent = Agent(
+    # Create king instance
+    initial_state = shared_data.king_states[king_id]
+    king = King(
         initial_state["x"],
         initial_state["y"],
         initial_state["color"],
-        agent_id
+        king_id
     )
     
     # Load level data
@@ -140,19 +140,19 @@ def run_agent(agent_id):
     running = True
     while running:
         try:
-            agent.update(elements)
+            king.update(elements)
             time.sleep(1/60)  # Cap at ~60 FPS
         except Exception as e:
-            print(f"Error in {agent_id} thread: {e}")
+            print(f"Error in {king_id} thread: {e}")
             time.sleep(1)
 
-def run_agents(num_agents=6):
-    # Create and start agent threads
-    agent_threads = []
-    for i in range(1, num_agents + 1):
-        agent_id = f"agent{i}"
-        thread = threading.Thread(target=run_agent, args=(agent_id,))
+def run_kings(num_kings=6):
+    # Create and start king threads
+    king_threads = []
+    for i in range(1, num_kings + 1):
+        king_id = f"king{i}"
+        thread = threading.Thread(target=run_king, args=(king_id,))
         thread.daemon = True
         thread.start()
-        agent_threads.append(thread)
+        king_threads.append(thread)
     
