@@ -42,7 +42,11 @@ def game_loop(shared_data, level_data):
                 running = False
 
         # Update camera
-        target_offset = playery - screen.get_height() / 2
+        highest_player_y = float('inf')
+        for agent_state in shared_data.agent_states.values():
+            highest_player_y = min(highest_player_y, agent_state['y'])
+
+        target_offset = highest_player_y - screen.get_height() / 2
         camera_offset = lerp(camera_offset, target_offset, 0.1)
 
         # Draw
