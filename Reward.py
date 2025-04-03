@@ -6,6 +6,9 @@ from shared_data import king_state
 # the player starts at 500
 # reward = 10(min_height_when_vy=0 - max_height_when_vy=0)
 # the issue is at the apex of a jump it has vy of 0, but not on a platform
+# instead it's going to record the end y value, and if the latest value is less than the highest one, then it'll take the latest one
+
+
 
 def reward():
     while True:
@@ -16,11 +19,6 @@ def reward():
         max_val = 1000000
         # This value is how high it climbs, so it will start at 570, but it will be 510 if it reaches the first platform
 
-        # if values[1] == 0:
-        #     min_val = max(min_val, values[0])
-        #     max_val = min(max_val, values[0])
-
         if values[1] == 0:
-            print(values)
-        
-        
+            min_val = max(min_val, values[0])
+            max_val = min(max_val, values[0])

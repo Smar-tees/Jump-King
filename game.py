@@ -1,5 +1,4 @@
 import pygame
-from flask import Flask, jsonify, send_from_directory
 from king import King
 
 pygame.init()
@@ -9,7 +8,7 @@ def lerp(a, b, t):
 
 # Example Player class
 
-def game_loop(shared_data, level_data):
+def game_loop(king_state, level_data):
     screen = pygame.display.set_mode((800, 600))
     pygame.display.set_caption("Jump King AI - Level Game")
     clock = pygame.time.Clock()
@@ -22,9 +21,9 @@ def game_loop(shared_data, level_data):
 
     # Initialize camera and king
     camera_offset = 0
-    king = King(shared_data.king_state["x"], 
-                shared_data.king_state["y"], 
-                shared_data.king_state["color"])
+    king = King(king_state["x"], 
+                king_state["y"], 
+                king_state["color"])
 
     running = True
     while running:
