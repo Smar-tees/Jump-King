@@ -1,11 +1,11 @@
 import pygame
 import time
 import threading
-from JK import shared_data
-from JK.level_loader import load_level
+import shared_data
+from level_loader import load_level
 
 class King:
-    def __init__(self, x, y, color, king_id):
+    def __init__(self, x, y, color):
         self.x = x
         self.y = y
         self.width = 30
@@ -14,25 +14,22 @@ class King:
         self.vy = 0
         self.on_ground = False
         self.color = color
-        # Additional attributes
         self.jumps_made = 0
-        self.prev_y = y  # Only tracking vertical movement now
+        self.prev_y = y
         self.distance_traveled = 0
-        # Add these new initializations
         self.clock = pygame.time.Clock()
         self.time_elapsed = 0.0
-        self.king_id = king_id
 
     def handle_input(self):
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
+        if keys[pygame.K_a]:
             self.vx = -5
-        elif keys[pygame.K_RIGHT]:
+        elif keys[pygame.K_d]:
             self.vx = 5
         else:
             self.vx = 0
 
-        if keys[pygame.K_SPACE] and self.on_ground:
+        if keys[pygame.K_w] and self.on_ground:
             self.vy = -10
             self.on_ground = False
             self.jumps_made += 1  # increment jump counter
@@ -106,7 +103,7 @@ class King:
         self.apply_physics(elements)
 
         # Update shared data
-        shared_data.king_states[self.king_id].update({
+        shared_data.king_state.update({
             "x": self.x,
             "y": self.y,
             "vx": self.vx,
@@ -115,20 +112,3 @@ class King:
             "jumps_made": self.jumps_made,
             "distance_traveled": round(self.distance_traveled, 2)
         })
-
-def spawn_kings(num_kings):
-    kings = []
-    for i in range(1, num_kings + 1):
-        king_id = f"king{i}"
-        initial_state = shared_data.king_states[king_id]
-        king = King(
-            initial_state["x"],
-            initial_state["y"],
-            initial_state["color"],
-            king_id
-        )
-        kings.append(king)
-        
-
-
-    return kings

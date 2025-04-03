@@ -1,6 +1,6 @@
 import pygame
-from king import spawn_kings
 from flask import Flask, jsonify, send_from_directory
+from king import King
 
 pygame.init()
 
@@ -20,14 +20,11 @@ def game_loop(shared_data, level_data):
     else:
         elements = level_data  # fallback if load_level returns a list
 
-    # Initialize default player position
+    # Initialize camera and king
     camera_offset = 0
-
-    kings = spawn_kings(6)
-
-    # Constants for drawing
-    PLAYER_WIDTH = 30
-    PLAYER_HEIGHT = 30
+    king = King(shared_data.king_state["x"], 
+                shared_data.king_state["y"], 
+                shared_data.king_state["color"])
 
     running = True
     while running:
@@ -38,11 +35,7 @@ def game_loop(shared_data, level_data):
                 running = False
 
         # Update camera
-        highest_player_y = float('inf')
-        for king_state in shared_data.king_states.values():
-            highest_player_y = min(highest_player_y, king_state['y'])
-
-        target_offset = highest_player_y - screen.get_height() / 2
+        target_offset = king.y - screen.get_height() / 2
         camera_offset = lerp(camera_offset, target_offset, 0.1)
 
         # Draw
@@ -56,12 +49,10 @@ def game_loop(shared_data, level_data):
             pygame.draw.rect(screen, color,
                            (elem["x"], elem["y"] - camera_offset, elem["width"], elem["height"]))
         
-        # Draw player
-        for king in kings:
-            king.update(elements)
+        # Update and draw king
+        king.update(elements)
+        pygame.draw.rect(screen, king.color, (king.x, king.y - camera_offset, king.width, king.height))
         
-            # Draw the king
-            pygame.draw.rect(screen, king.color, (king.x, king.y - camera_offset, king.width, king.height))   
         pygame.display.flip()
 
     pygame.quit()

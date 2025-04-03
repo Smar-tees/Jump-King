@@ -24,8 +24,8 @@ How should the AI decide when and how to move?
 
 
 
- - Make the camera offset work
- - Figure out the Agent movement system - make it move randomly at first 
- - Make the Agent reward system
+ - Make the camera offset work DONE
+ - Figure out the Agent movement system - make it move randomly at first DONE
+ - Make the Agent reward system 
  - Make the generational learning algorithim
  - Profit

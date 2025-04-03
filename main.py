@@ -1,11 +1,14 @@
 import pygame
-import json
+import random
+import time
 import os
-import math
 import threading
 import keyboard
-from JK import game, shared_data, level_loader
+import game
+import shared_data
+import level_loader
 from flask import Flask, jsonify, send_from_directory
+from Reward import reward
 
 
 pygame.init()
@@ -27,11 +30,33 @@ def serve_player_state():
 def run_server():
     app.run(port=5000, debug=False, use_reloader=False)
 
+def move_king():
+    """Move the king by simulating random key presses"""
+    keys = ['a', 'd', 'w']  # movement keys
+    if random.random() < 0.5:  # 2% chance to move each frame
+        key = random.choice(keys)
+        # Simulate key press and release
+        keyboard.press(key)
+        time.sleep(0.1)  # Hold key briefly
+        keyboard.release(key)
+
+def Agent_loop():
+    while True:
+        move_king()
+
 if __name__ == "__main__":
     # Start the Flask server in a background thread
     server_thread = threading.Thread(target=run_server)
     server_thread.daemon = True
     server_thread.start()
+
+    # king_thread = threading.Thread(target=Agent_loop)
+    # king_thread.daemon = True
+    # king_thread.start()
+
+    reward_thread = threading.Thread(target=reward)
+    reward_thread.daemon = True
+    reward_thread.start()
 
     # Start the game loop
     level = level_loader.load_level()
