@@ -6,8 +6,6 @@ pygame.init()
 def lerp(a, b, t):
     return a + (b - a) * t
 
-# Example Player class
-
 def game_loop(king_state, level_data):
     screen = pygame.display.set_mode((800, 600))
     pygame.display.set_caption("Jump King AI - Level Game")
@@ -25,6 +23,7 @@ def game_loop(king_state, level_data):
                 king_state["y"], 
                 king_state["color"])
 
+    global running
     running = True
     while running:
         dt = clock.tick(60)
