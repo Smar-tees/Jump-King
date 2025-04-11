@@ -4,13 +4,15 @@ import keyboard
 import time
 
 class agent():
-    def __init__(self, agent_id, move_des='random'):
+    def __init__(self, agent_id, move_des, best_pattern):
         self.pattern = []
         self.reward = 0
         self.id = agent_id
         self.min_val = 0
         self.max_val = 1000000
         self.move_des = move_des
+        self.script = best_pattern
+
     
     def update_heights(self, king_state):
         self.min_val = max(self.min_val, king_state['y'])
@@ -31,6 +33,14 @@ class agent():
             keyboard.press(key)
             time.sleep(0.1)
             keyboard.release(key)
+        
+        elif self.move_des == 'scripted':
+            self.pattern = self.script
+            for key in self.pattern:
+                keyboard.press(key)
+                time.sleep(0.1)
+                keyboard.release(key)
+            self.move_des = 'random'
         
 
     def save_pattern(self):

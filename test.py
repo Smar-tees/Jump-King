@@ -1,19 +1,4 @@
-import threading
-import time
-
-stop_flag = False
-
-def worker():
-    while not stop_flag:
-        # Do some work
-        print("Working...")
-        time.sleep(0.5)
-    print("Exiting thread gracefully.")
-
-t = threading.Thread(target=worker)
-t.start()
-
-time.sleep(3)
-stop_flag = True
-t.join()  # Wait for the thread to finish
-print("Thread stopped.")
+import pandas as pd
+df = pd.read_csv('paths.csv')
+best_row = df.loc[df['reward'].idxmax()]
+best_pattern = best_row['pattern'] 
