@@ -20,9 +20,10 @@ class agent():
         self.max_val = min(self.max_val, king_state['y'])
         # This value is how high it climbs, so it will start at 570, but it will be 510 if it reaches the first platform
     
-    def calc_reward(self, end_y):
+    def calc_reward(self, end_y, end_vy):
         if end_y > self.max_val:
-            self.max_val = end_y
+            if end_vy != 0:
+                self.max_val = end_y
         self.reward = self.min_val - self.max_val
     
     def pick_move(self):

@@ -20,12 +20,12 @@ def start_agent(id, move_des, best_pattern):
             player.update_heights(king_state)
 
     print('agent loop stopped')
-    player.calc_reward(king_state['y'])
+    player.calc_reward(king_state['y'], king_state['vy'])
     player.save_pattern()
 
 if __name__ == "__main__":
-    agent_num = 100
-    generation_num = 10
+    agent_num = 50
+    generation_num = 8
     names = ['Prof Ellis', 'Logan', 'Walter', 'Chris', 'Josh', 'Michael', 'Kevin', 'John']
     move_des = 'random'
     best_pattern = []
@@ -64,7 +64,7 @@ if __name__ == "__main__":
 
 
 
-            time.sleep(5*(generation+1))
+            time.sleep(3 + (generation+1))
             stop_agent = True
             game.running = False
             king_thread.join()
